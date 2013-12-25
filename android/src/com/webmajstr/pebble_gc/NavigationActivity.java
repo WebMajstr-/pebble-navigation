@@ -34,14 +34,13 @@ public class NavigationActivity extends Activity {
 		Intent intent = new Intent(NavigationActivity.this, WatchService.class);
 		intent.putExtra("latitude", gc_latitude);
 		intent.putExtra("longitude", gc_longitude);
-		// TODO: pass additional data to service, then use up/down buttons
-		// on Pebble to switch between time and additional data
-		/*
-		 * intent.putExtra("difficulty", gc_difficulty);
-		 * intent.putExtra("terrain", gc_terrain); intent.putExtra("name",
-		 * gc_name); intent.putExtra("code", gc_code); intent.putExtra("size",
-		 * gc_size);
-		 */
+		
+		intent.putExtra("difficulty", gc_difficulty);
+		intent.putExtra("terrain", gc_terrain);
+		intent.putExtra("name", gc_name);
+		intent.putExtra("code", gc_code);
+		intent.putExtra("size", gc_size);
+		
 		startService(intent);
 	}
 

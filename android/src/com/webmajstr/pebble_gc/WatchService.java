@@ -19,6 +19,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 public class WatchService extends Service {
@@ -30,6 +31,17 @@ public class WatchService extends Service {
     
     Location geocacheLocation = new Location("");
     
+    float gc_difficulty, gc_terrain;
+	String gc_name, gc_code, gc_size;
+	
+	private static final int DISTANCE_KEY = 0;
+	private static final int AZIMUT_INDEX_KEY = 1;
+	private static final int EXTRAS_KEY = 2;
+	private static final int DT_RATING_KEY = 3;
+	private static final int GC_NAME_KEY = 4;
+	private static final int GC_CODE_KEY = 5;
+	private static final int GC_SIZE_KEY = 6;
+	
     private UUID uuid = UUID.fromString("6191ad65-6cb1-404f-bccc-2446654c20ab"); //v2
     
     @Override
@@ -110,7 +122,7 @@ public class WatchService extends Service {
     	float direction = azimut - bearing;
 		if(direction < 0) direction = 360 + direction;
 		
-		updateWatch(distance, direction);
+		updateWatchWithLocation(distance, direction);
     
     }
     
@@ -123,7 +135,7 @@ public class WatchService extends Service {
     }
     
     
-    public void updateWatch(float distance, float azimut) {
+    public void updateWatchWithLocation(float distance, float azimut) {
 
     	int azimutInt = (int)Math.round(azimut);
     	int distanceInt = (int)Math.round(distance);
@@ -132,25 +144,46 @@ public class WatchService extends Service {
     	// azimut of 30 degrees +- 15 degrees is index 1, etc..
     	int azimutIndex = ((azimutInt + 15)/30) % 12;
     	
-        PebbleDictionary data = new PebbleDictionary();
-
-        data.addString(0, String.format("%d m", distanceInt));
-        data.addUint8(1, (byte)azimutIndex);
-        
-        PebbleKit.sendDataToPebble(getApplicationContext(), uuid, data);
+    	sendToPebble(String.format("%d m", distanceInt), azimutIndex);
+    	
     }
     
-    public void updateWatchInit() {
-
+    public void sendToPebble(String distance, int azimutIndex) {
+    	
+    	boolean hasExtras = checkHasExtras();
+    	
     	PebbleDictionary data = new PebbleDictionary();
 
-        data.addString(0, "Starting..");
-        data.addUint8(1, (byte)0);
+        data.addString(DISTANCE_KEY, distance);
+        data.addUint8(AZIMUT_INDEX_KEY, (byte)azimutIndex);
+        data.addUint8(EXTRAS_KEY, (byte)(hasExtras?1:0) );
+        
+        if(hasExtras){
+        	
+        	data.addString(DT_RATING_KEY, String.format("D%f/T%f", gc_difficulty, gc_terrain));
+        	data.addString(GC_NAME_KEY, gc_name.substring(0, 20));
+        	data.addString(GC_CODE_KEY, gc_code);
+        	data.addString(GC_SIZE_KEY, gc_size);
+        	
+        }
         
         PebbleKit.sendDataToPebble(getApplicationContext(), uuid, data);
+        
     }
     
-    private void showNotification() {
+    private boolean checkHasExtras() {
+
+    	// function that makes sure that extras exists.
+    	// Not really smart way, but works
+    	if(gc_name == null || gc_code == null || gc_size == null){
+    		return false;
+    	} else {
+    		return true;
+    	}
+    	
+	}
+
+	private void showNotification() {
     	
         Intent notificationIntent = new Intent("android.intent.CLOSE_ACTIVITY");
         PendingIntent intent = PendingIntent.getBroadcast(this, 0 , notificationIntent, 0);
@@ -172,12 +205,19 @@ public class WatchService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
     	//reset watch to default state
-    	updateWatchInit();
+    	sendToPebble("Starting..", 0);
     	
 		Toast.makeText(this, R.string.navigation_has_started, Toast.LENGTH_LONG).show();
     	
     	Double gc_latitude = intent.getDoubleExtra("latitude", 0.0);
     	Double gc_longitude = intent.getDoubleExtra("longitude", 0.0);
+    	
+    	gc_difficulty = intent.getFloatExtra("difficulty", 0);
+		gc_terrain = intent.getFloatExtra("terrain", 0);
+		gc_name = intent.getStringExtra("name");
+		gc_code = intent.getStringExtra("code");
+		gc_size = intent.getStringExtra("size");
+		
         geocacheLocation.setLatitude( gc_latitude );
         geocacheLocation.setLongitude( gc_longitude );
                 

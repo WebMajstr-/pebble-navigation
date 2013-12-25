@@ -18,6 +18,11 @@ static const uint32_t COMPASS_ICONS[] = {
 enum GeoKey {
   DISTANCE_KEY = 0x0,
   AZIMUT_INDEX_KEY = 0x1,
+  EXTRAS_KEY = 0x2,
+  DT_RATING_KEY = 0x3,
+  GC_NAME_KEY = 0x4,
+  GC_CODE_KEY = 0x5,
+  GC_SIZE_KEY = 0x6
 };
 
 Window *window;
@@ -30,7 +35,7 @@ TextLayer *text_time_layer;
 Layer *line_layer;
 
 static AppSync sync;
-static uint8_t sync_buffer[64];
+static uint8_t sync_buffer[150];
 
 static void sync_tuple_changed_callback(const uint32_t key,
                                         const Tuple* new_tuple,
@@ -52,6 +57,7 @@ static void sync_tuple_changed_callback(const uint32_t key,
           COMPASS_ICONS[new_tuple->value->uint8]);
       bitmap_layer_set_bitmap(image_layer, image_bitmap);
       break;
+
   }
 }
 
@@ -143,14 +149,14 @@ void handle_init(void) {
   text_layer_set_font(text_time_layer, fonts_load_custom_font(roboto_32));
   layer_add_child(date_holder, text_layer_get_layer(text_time_layer));
 
-  // Setup messaging
-  const int inbound_size = 64;
-  const int outbound_size = 64;
+  const int inbound_size = 150;
+  const int outbound_size = 0;
   app_message_open(inbound_size, outbound_size);
 
   Tuplet initial_values[] = {
     TupletCString(DISTANCE_KEY, "Starting.."),
     TupletInteger(AZIMUT_INDEX_KEY, 0),
+    TupletInteger(EXTRAS_KEY, 0),
   };
 
   app_sync_init(&sync, sync_buffer, sizeof(sync_buffer), initial_values,
