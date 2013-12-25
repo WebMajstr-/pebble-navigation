@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Pebble Geocaching</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_navigation">Pebble Navigation</string>
+    <string name="how_to_use">Hello dear user!!\n\nThere is no need to open this app here. To use the app, simply open C:Geo app. When you want to navigate to geocache, simply select that geocache, click Navigate and select Pebble! That\'s it! (Of couse, you must have application installed on pebble as well!)</string>
+    
+
+    <string name="service_started">Click here to stop the app!</string>
+    
+
+    <string name="navigation_has_started">Pebble Geocaching navigation has started!</string>
+</resources>

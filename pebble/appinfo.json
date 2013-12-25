@@ -1,0 +1,102 @@
+{
+  "uuid": "6191ad65-6cb1-404f-bccc-2446654c20ab",
+  "shortName": "Geocaching",
+  "longName": "Geocaching for Pebble",
+  "companyName": "WebMajstr",
+  "versionCode": 1,
+  "versionLabel": "0.9",
+  "watchapp": {
+    "watchface": false
+  },
+  "resources": {
+    "media": [
+      {
+        "menuIcon": true,
+        "type": "png",
+        "name": "IMAGE_MENU_ICON",
+        "file": "images/menu_icon_geocache.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_0",
+        "file": "images/smer_0.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_1",
+        "file": "images/smer_1.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_2",
+        "file": "images/smer_2.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_3",
+        "file": "images/smer_3.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_4",
+        "file": "images/smer_4.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_5",
+        "file": "images/smer_5.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_6",
+        "file": "images/smer_6.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_7",
+        "file": "images/smer_7.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_8",
+        "file": "images/smer_8.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_9",
+        "file": "images/smer_9.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_10",
+        "file": "images/smer_10.png"
+      },
+      {
+        "type": "png",
+        "name": "DIRECTION_11",
+        "file": "images/smer_11.png"
+      },
+      {
+        "type": "png",
+        "name": "NO_BT",
+        "file": "images/no_bt.png"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ROBOTO_CONDENSED_30",
+        "file": "fonts/Roboto-Condensed.ttf"
+      },
+      {
+        "characterRegex": "[:0-9]",
+        "type": "font",
+        "name": "FONT_ROBOTO_BOLD_SUBSET_32",
+        "file": "fonts/Roboto-Bold.ttf"
+      },
+      {
+        "type": "font",
+        "name": "FONT_ROBOTO_CONDENSED_36",
+        "file": "fonts/Roboto-Condensed.ttf"
+      }
+    ]
+  }
+}
