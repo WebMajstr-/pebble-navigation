@@ -102,9 +102,8 @@ public class WatchService extends Service {
           };
 
         // Register the listener with the Location Manager to receive location updates
-        // minTime is set to 0 to keep GPS on with most mobile phones, although value like 2000 seems OK for most of them
         // impact on battery has not been determined
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, locationListener);
       	
     }
     
