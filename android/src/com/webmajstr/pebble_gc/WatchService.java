@@ -204,7 +204,7 @@ public class WatchService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
     	//reset watch to default state
-    	sendToPebble("Starting..", 0);
+    	sendToPebble("NO GPS", 0);
     	
 		Toast.makeText(this, R.string.navigation_has_started, Toast.LENGTH_LONG).show();
     	

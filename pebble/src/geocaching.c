@@ -154,7 +154,7 @@ void handle_init(void) {
   app_message_open(inbound_size, outbound_size);
 
   Tuplet initial_values[] = {
-    TupletCString(DISTANCE_KEY, "Starting.."),
+    TupletCString(DISTANCE_KEY, "NO GPS"),
     TupletInteger(AZIMUT_INDEX_KEY, 0),
     TupletInteger(EXTRAS_KEY, 0),
   };
