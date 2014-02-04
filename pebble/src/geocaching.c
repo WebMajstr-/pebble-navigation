@@ -83,23 +83,35 @@ void bluetooth_connection_changed(bool connected) {
   
 }
 
-void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
-  static char time_text[] = "00:00";
+static uint8_t seconds = -1;
 
-  char *time_format;
+void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
+  if (++seconds % 4)
+    return;
+  seconds %= 8;
 
-  if (clock_is_24h_style()) {
-    time_format = "%R";
+  if (seconds) {
+    const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
+    const char *gc_code = tuple == NULL ? "" : tuple->value->cstring;
+    text_layer_set_text(text_time_layer, *gc_code ? gc_code : "C:GEO");
   } else {
-    time_format = "%I:%M";
-  }
+    static char time_text[] = "00:00";
 
-  strftime(time_text, sizeof(time_text), time_format, tick_time);
+    const char *time_format;
 
-  if (!clock_is_24h_style() && (time_text[0] == '0')) {
-    text_layer_set_text(text_time_layer, time_text + 1);
-  } else {
-    text_layer_set_text(text_time_layer, time_text);
+    if (clock_is_24h_style()) {
+      time_format = "%R";
+    } else {
+      time_format = "%I:%M";
+    }
+
+    strftime(time_text, sizeof(time_text), time_format, tick_time);
+
+    if (!clock_is_24h_style() && (time_text[0] == '0')) {
+      text_layer_set_text(text_time_layer, time_text + 1);
+    } else {
+      text_layer_set_text(text_time_layer, time_text);
+    }
   }
 }
 
@@ -125,7 +137,6 @@ void handle_init(void) {
   layer_add_child(window_layer, distance_holder);
 
   ResHandle roboto_36 = resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_36);
-
   text_distance_layer = text_layer_create(GRect(8, 0, 144-8, 40));
   text_layer_set_text_color(text_distance_layer, GColorWhite);
   text_layer_set_text_alignment(text_distance_layer, GTextAlignmentCenter);
@@ -142,11 +153,12 @@ void handle_init(void) {
   layer_set_update_proc(line_layer, line_layer_update_callback);
   layer_add_child(date_holder, line_layer);
 
-  ResHandle roboto_32 = resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_32);
-  text_time_layer = text_layer_create(GRect(32, -2, 144-32, 34));
+  ResHandle roboto_22 = resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_22);
+  text_time_layer = text_layer_create(GRect(16, 2, 144-32, 32));
   text_layer_set_text_color(text_time_layer, GColorWhite);
+  text_layer_set_text_alignment(text_time_layer, GTextAlignmentCenter);
   text_layer_set_background_color(text_time_layer, GColorClear);
-  text_layer_set_font(text_time_layer, fonts_load_custom_font(roboto_32));
+  text_layer_set_font(text_time_layer, fonts_load_custom_font(roboto_22));
   layer_add_child(date_holder, text_layer_get_layer(text_time_layer));
 
   const int inbound_size = 150;
@@ -157,6 +169,10 @@ void handle_init(void) {
     TupletCString(DISTANCE_KEY, "NO GPS"),
     TupletInteger(AZIMUT_INDEX_KEY, 0),
     TupletInteger(EXTRAS_KEY, 0),
+    TupletCString(DT_RATING_KEY, ""),
+    TupletCString(GC_NAME_KEY, ""),
+    TupletCString(GC_CODE_KEY, ""),
+    TupletCString(GC_NAME_KEY, "")
   };
 
   app_sync_init(&sync, sync_buffer, sizeof(sync_buffer), initial_values,
@@ -165,7 +181,7 @@ void handle_init(void) {
 
   // Subscribe to notifications
   bluetooth_connection_service_subscribe(bluetooth_connection_changed);
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+  tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
 
 }
 
