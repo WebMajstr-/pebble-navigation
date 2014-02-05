@@ -91,7 +91,7 @@ void bluetooth_connection_changed(bool connected) {
  void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
     data_display++;
-    data_display %= 3;
+    data_display %= 5;
 
     if(data_display == 0){
       tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
@@ -109,13 +109,26 @@ void bluetooth_connection_changed(bool connected) {
       const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
       text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
 
+    } else if(data_display == 3){
+
+      const Tuple *tuple = app_sync_get(&sync, GC_SIZE_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    } else if(data_display == 4){
+
+      const Tuple *tuple = app_sync_get(&sync, DT_RATING_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
     }
+
     
  }
 
  void down_click_handler(ClickRecognizerRef recognizer, void *context) {
     
-    if(data_display == 0) data_display = 3;
+    if(data_display == 0) data_display = 5;
     data_display--;
 
     if(data_display == 0){
@@ -129,9 +142,21 @@ void bluetooth_connection_changed(bool connected) {
 
     } else if(data_display == 2){
 
+      const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    } else if(data_display == 3){
+
+      const Tuple *tuple = app_sync_get(&sync, GC_SIZE_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    } else if(data_display == 4){
+
       tick_timer_service_unsubscribe();
 
-      const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
+      const Tuple *tuple = app_sync_get(&sync, DT_RATING_KEY);
       const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
       text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
 
@@ -223,7 +248,7 @@ void handle_init(void) {
     TupletCString(DT_RATING_KEY, ""),
     TupletCString(GC_NAME_KEY, ""),
     TupletCString(GC_CODE_KEY, ""),
-    TupletCString(GC_NAME_KEY, "")
+    TupletCString(GC_SIZE_KEY, "")
   };
 
   app_sync_init(&sync, sync_buffer, sizeof(sync_buffer), initial_values,

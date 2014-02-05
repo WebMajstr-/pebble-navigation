@@ -159,7 +159,9 @@ public class WatchService extends Service {
         
         if(hasExtras){
         	
-        	data.addString(DT_RATING_KEY, String.format("D%f/T%f", gc_difficulty, gc_terrain));
+        	data.addString(DT_RATING_KEY, "D"+((gc_difficulty == (int)gc_difficulty) ? String.format("%d", (int)gc_difficulty) : String.format("%s", gc_difficulty))+" / T"+
+        			((gc_terrain == (int)gc_terrain) ? String.format("%d", (int)gc_terrain) : String.format("%s", gc_terrain)) );
+        	
         	data.addString(GC_NAME_KEY, (gc_name.length() > 20) ? gc_name.substring(0, 20) : gc_name);
         	data.addString(GC_CODE_KEY, gc_code);
         	data.addString(GC_SIZE_KEY, gc_size);
