@@ -87,7 +87,6 @@
         "file": "fonts/Roboto-Condensed.ttf"
       },
       {
-        "characterRegex": "[:0-9A-Z?]",
         "type": "font",
         "name": "FONT_ROBOTO_BOLD_SUBSET_22",
         "file": "fonts/Roboto-Bold.ttf"

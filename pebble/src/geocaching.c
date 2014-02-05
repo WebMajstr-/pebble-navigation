@@ -34,8 +34,12 @@ TextLayer *text_distance_layer;
 TextLayer *text_time_layer;
 Layer *line_layer;
 
+static uint8_t data_display = 0;
+
 static AppSync sync;
 static uint8_t sync_buffer[150];
+
+void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed);
 
 static void sync_tuple_changed_callback(const uint32_t key,
                                         const Tuple* new_tuple,
@@ -83,35 +87,82 @@ void bluetooth_connection_changed(bool connected) {
   
 }
 
-static uint8_t seconds = -1;
 
-void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
-  if (++seconds % 4)
-    return;
-  seconds %= 8;
+ void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
-  if (seconds) {
-    const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
-    const char *gc_code = tuple == NULL ? "" : tuple->value->cstring;
-    text_layer_set_text(text_time_layer, *gc_code ? gc_code : "C:GEO");
+    data_display++;
+    data_display %= 3;
+
+    if(data_display == 0){
+      tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+      
+    } else if(data_display == 1){
+
+      tick_timer_service_unsubscribe();
+      const Tuple *tuple = app_sync_get(&sync, GC_NAME_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    } else if(data_display == 2){
+
+      const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    }
+    
+ }
+
+ void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+    
+    if(data_display == 0) data_display = 3;
+    data_display--;
+
+    if(data_display == 0){
+      tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+    
+    } else if(data_display == 1){
+
+      const Tuple *tuple = app_sync_get(&sync, GC_NAME_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    } else if(data_display == 2){
+
+      tick_timer_service_unsubscribe();
+
+      const Tuple *tuple = app_sync_get(&sync, GC_CODE_KEY);
+      const char *gc_data = tuple == NULL ? "" : tuple->value->cstring;
+      text_layer_set_text(text_time_layer, *gc_data ? gc_data : "??");
+
+    }
+    
+    
+ }
+
+void config_buttons_provider(void *context) {
+   window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
+   window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
+ }
+
+
+void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
+  static char time_text[] = "00:00";
+
+  char *time_format;
+
+  if (clock_is_24h_style()) {
+    time_format = "%R";
   } else {
-    static char time_text[] = "00:00";
+    time_format = "%I:%M";
+  }
 
-    const char *time_format;
+  strftime(time_text, sizeof(time_text), time_format, tick_time);
 
-    if (clock_is_24h_style()) {
-      time_format = "%R";
-    } else {
-      time_format = "%I:%M";
-    }
-
-    strftime(time_text, sizeof(time_text), time_format, tick_time);
-
-    if (!clock_is_24h_style() && (time_text[0] == '0')) {
-      text_layer_set_text(text_time_layer, time_text + 1);
-    } else {
-      text_layer_set_text(text_time_layer, time_text);
-    }
+  if (!clock_is_24h_style() && (time_text[0] == '0')) {
+    text_layer_set_text(text_time_layer, time_text + 1);
+  } else {
+    text_layer_set_text(text_time_layer, time_text);
   }
 }
 
@@ -181,7 +232,9 @@ void handle_init(void) {
 
   // Subscribe to notifications
   bluetooth_connection_service_subscribe(bluetooth_connection_changed);
-  tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  window_set_click_config_provider(window, config_buttons_provider);
 
 }
 
