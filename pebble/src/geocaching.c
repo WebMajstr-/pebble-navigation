@@ -87,11 +87,18 @@ void bluetooth_connection_changed(bool connected) {
   
 }
 
+bool have_additional_data(){
+  const Tuple *tuple = app_sync_get(&sync, EXTRAS_KEY);
+  return (tuple == NULL || tuple->value->uint8 == 0)? false : true;
+}
+
 
  void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
     data_display++;
     data_display %= 5;
+
+    if ( !have_additional_data() ) data_display = 0;
 
     if(data_display == 0){
       tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
@@ -130,6 +137,8 @@ void bluetooth_connection_changed(bool connected) {
     
     if(data_display == 0) data_display = 5;
     data_display--;
+
+    if ( !have_additional_data() ) data_display = 0;
 
     if(data_display == 0){
       tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);

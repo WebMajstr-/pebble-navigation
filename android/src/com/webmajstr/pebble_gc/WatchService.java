@@ -19,7 +19,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 public class WatchService extends Service {
@@ -204,11 +203,6 @@ public class WatchService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-    	//reset watch to default state
-    	sendToPebble("NO GPS", 0);
-    	
-		Toast.makeText(this, R.string.navigation_has_started, Toast.LENGTH_LONG).show();
     	
     	Double gc_latitude = intent.getDoubleExtra("latitude", 0.0);
     	Double gc_longitude = intent.getDoubleExtra("longitude", 0.0);
@@ -221,6 +215,12 @@ public class WatchService extends Service {
 		
         geocacheLocation.setLatitude( gc_latitude );
         geocacheLocation.setLongitude( gc_longitude );
+                
+        //reset watch to default state
+        //TODO do make sure the watchapp is listening to messages
+    	sendToPebble("NO GPS", 0);
+    	
+    	Toast.makeText(this, R.string.navigation_has_started, Toast.LENGTH_LONG).show();
                 
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
