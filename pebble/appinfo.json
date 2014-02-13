@@ -3,8 +3,8 @@
   "shortName": "Geocaching",
   "longName": "Geocaching for Pebble",
   "companyName": "WebMajstr",
-  "versionCode": 1,
-  "versionLabel": "0.9",
+  "versionCode": 2,
+  "versionLabel": "1.0.0",
   "watchapp": {
     "watchface": false
   },
