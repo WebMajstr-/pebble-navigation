@@ -1,4 +1,4 @@
-pebble-cgeo
+pebble-navigation
 ===========
 
-Application that connect Pebble Watch and C:Geo app
+Application that connect Pebble Watch and Navigational (Mostly GC) apps
