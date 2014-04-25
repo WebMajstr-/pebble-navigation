@@ -68,11 +68,11 @@ public class NavigationActivity extends Activity {
 					finish();
 		        	
 		        } else {
-		        	Toast.makeText(getApplicationContext(), "Error: Something went wrong!", Toast.LENGTH_SHORT).show();
+		        	Toast.makeText(getApplicationContext(), getText(R.string.error_message) + " #13", Toast.LENGTH_SHORT).show();
 		        }
 					
 			} else {
-				Toast.makeText(getApplicationContext(), "Error: Something went wrong.", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), getText(R.string.error_message) + " #14", Toast.LENGTH_SHORT).show();
 			}
 			
 			
