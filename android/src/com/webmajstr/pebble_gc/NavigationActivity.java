@@ -57,7 +57,11 @@ public class NavigationActivity extends Activity {
 				
 				Coordinates gps = new Coordinates();
 				
-				if( gps.parse( text ) ){
+				// Locus app has new format for coordinates.. It says "Point, " at begining of data... :/ 
+				// This is a dirty hack..
+				String text2 = text.substring( text.indexOf(",") + 1 );
+								
+				if( gps.parse( text ) || (gps.parse( text2 ) ) ){
 		        	
 		        	gc_latitude = gps.getLatitude();
 					gc_longitude = gps.getLongitude();
