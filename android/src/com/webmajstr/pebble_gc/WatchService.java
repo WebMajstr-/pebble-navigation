@@ -34,12 +34,13 @@ public class WatchService extends Service {
 	String gc_name, gc_code, gc_size;
 	
 	private static final int DISTANCE_KEY = 0;
-	private static final int AZIMUT_INDEX_KEY = 1;
+	private static final int BEARING_INDEX_KEY = 1;
 	private static final int EXTRAS_KEY = 2;
 	private static final int DT_RATING_KEY = 3;
 	private static final int GC_NAME_KEY = 4;
 	private static final int GC_CODE_KEY = 5;
 	private static final int GC_SIZE_KEY = 6;
+	private static final int AZIMUTH_KEY = 7;
 	
     private UUID uuid = UUID.fromString("6191ad65-6cb1-404f-bccc-2446654c20ab"); //v2
     
@@ -112,15 +113,15 @@ public class WatchService extends Service {
     	
     	
     	float distance = currentLocation.distanceTo(geocacheLocation);
-    	float bearing = currentLocation.getBearing();
-    	float azimut = currentLocation.bearingTo(geocacheLocation);
-    	if(azimut < 0) azimut = 360 + azimut;
-    	if(bearing < 0) bearing = 360 + bearing;
+    	float deviceBearing = currentLocation.getBearing();
+    	float azimuth = currentLocation.bearingTo(geocacheLocation);
+    	if(azimuth < 0) azimuth = 360 + azimuth;
+    	if(deviceBearing < 0) deviceBearing = 360 + deviceBearing;
 
-    	float direction = azimut - bearing;
-		if(direction < 0) direction = 360 + direction;
+    	float bearing = azimuth - deviceBearing;
+		if(bearing < 0) bearing = 360 + bearing;
 		
-		updateWatchWithLocation(distance, direction);
+		updateWatchWithLocation(distance, bearing, azimuth);
     
     }
     
@@ -133,27 +134,29 @@ public class WatchService extends Service {
     }
     
     
-    public void updateWatchWithLocation(float distance, float azimut) {
+    public void updateWatchWithLocation(float distance, float bearing, float azimuth) {
 
-    	int azimutInt = (int)Math.round(azimut);
+    	int bearingInt = (int)Math.round(bearing);
     	int distanceInt = (int)Math.round(distance);
+    	int azimuthInt = (int)Math.round(azimuth);
     	
-    	// convert azimut in degrees to index of image to show. north +- 15 degrees is index 0,
-    	// azimut of 30 degrees +- 15 degrees is index 1, etc..
-    	int azimutIndex = ((azimutInt + 15)/30) % 12;
+    	// convert bearing in degrees to index of image to show. north +- 15 degrees is index 0,
+    	// bearing of 30 degrees +- 15 degrees is index 1, etc..
+    	int bearingIndex = ((bearingInt + 15)/30) % 12;
     	
-    	sendToPebble(String.format("%d m", distanceInt), azimutIndex);
+    	sendToPebble(String.format("%d m", distanceInt), bearingIndex, azimuthInt);
     	
     }
     
-    public void sendToPebble(String distance, int azimutIndex) {
+    public void sendToPebble(String distance, int bearingIndex, int azimuth) {
     	
     	boolean hasExtras = checkHasExtras();
     	
     	PebbleDictionary data = new PebbleDictionary();
 
         data.addString(DISTANCE_KEY, distance);
-        data.addUint8(AZIMUT_INDEX_KEY, (byte)azimutIndex);
+        data.addUint8(BEARING_INDEX_KEY, (byte)bearingIndex);
+        data.addUint16(AZIMUTH_KEY, (short) azimuth);
         data.addUint8(EXTRAS_KEY, (byte)(hasExtras?1:0) );
         
         if(hasExtras){
@@ -218,7 +221,7 @@ public class WatchService extends Service {
                 
         //reset watch to default state
         //TODO do make sure the watchapp is listening to messages
-    	sendToPebble("NO GPS", 0);
+    	sendToPebble("NO GPS", 0, 0);
     	
     	Toast.makeText(this, R.string.navigation_has_started, Toast.LENGTH_LONG).show();
                 
